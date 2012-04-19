@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+require File.dirname(__FILE__) + "/../lib/batch_import_packager"
+
+BatchImportPackager.new(Dir.pwd, ARGV.pop).run
