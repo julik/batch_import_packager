@@ -14,7 +14,6 @@ class BatchImportPackager::ImportFile
     doc = REXML::Document.new(File.read(import_node_path))
     path_to_first_sequence_element = REXML::XPath.first(doc, 'Setup/State/FileName').text
     
-    sequence = Sequencer.from_single_file(path_to_first_sequence_element)
-    @sequences.push(sequence)
+    @sequences.push(Sequencer.from_single_file(path_to_first_sequence_element))
   end
 end

@@ -34,6 +34,7 @@ class BatchImportPackager::GatewayImport
     
     frame_range = (frames_padded[0].to_i)..(frames_padded[-1].to_i)
     first_file = descriptor.gsub(FRAMES_PATTERN, frames_padded[0])
+    
     Sequencer.from_single_file(first_file)
   end
 end

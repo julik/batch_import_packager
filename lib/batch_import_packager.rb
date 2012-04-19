@@ -15,7 +15,6 @@ class BatchImportPackager
   def initialize(batch_file_path)
     @sequences = []
     collect_imports(batch_file_path)
-    @sequences.uniq!
   end
   
   def detect_all_imports!
@@ -46,7 +45,7 @@ class BatchImportPackager
   
   def display_sequence(seq)
     sequences.each do | seq |
-      puts "--> Found linked sequence #{seq}"
+      puts "--> Found linked sequence #{seq.inspect}"
     end
   end
   
@@ -70,11 +69,7 @@ class BatchImportPackager
   
   def add_sequences(extra_sequences)
     extra_sequences.each do | seq |
-      puts seq
-      unless @sequences.include?(seq)
-        display_sequence(seq)
-        @sequences.push(seq)
-      end
+      @sequences.push(seq) unless @sequences.include?(seq)
     end
   end
 end
