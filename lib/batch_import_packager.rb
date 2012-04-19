@@ -28,19 +28,24 @@ class BatchImportPackager
     all_the_files = @sequences.map{|s| s.to_paths }.flatten.uniq
     puts "=== WILL COPY %d FILES ===" % all_the_files.length
     
-    pbar = ProgressBar.new("Copying", all_the_files.length, $stdout)
+    pbar = ProgressBar.new("Copying", all_the_files.length, $stderr)
     all_the_files.each do | path |
       pbar.inc
-      FileUtils.cp(path, destination  + "/") unless dry_run
+      run_copy(path, destination + '/') unless dry_run
     end
     pbar.finish
   end
   
+  # Executes the copy
+  def run_copy(path, destination_directory_with_trailing_slash)
+    FileUtils.cp(path, destination_directory_with_trailing_slash)
+  end
+  
   private
   
-  def check_destination!(destionation)
+  def check_destination!(destination)
     raise "Destination directory #{destination} does not exist" unless File.exist?(destination)
-    raise "Destination #{destination} is not a directory" unless File.dir?(destination)
+    raise "Destination #{destination} is not a directory" unless File.directory?(destination)
   end
   
   def display_sequence(seq)
