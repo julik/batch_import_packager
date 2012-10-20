@@ -10,11 +10,15 @@ class BatchImportPackager
   VERSION = '1.0.0'
   
   attr_reader :sequences
-
-    
-  def initialize(batch_file_path)
+  
+  def self.collect(dir_path, destination)
+    glob = File.join(dir_path, "**", "*.batch")
+    new(Dir.glob(glob)).pack_imports!(destination)
+  end
+  
+  def initialize(*batch_file_paths)
     @sequences = []
-    collect_imports(batch_file_path)
+    batch_file_paths.flatten.map(&method(:collect_imports))
   end
   
   def detect_all_imports!
@@ -31,7 +35,12 @@ class BatchImportPackager
     pbar = ProgressBar.new("Copying", all_the_files.length, $stderr)
     all_the_files.each do | path |
       pbar.inc
-      run_copy(path, destination + '/') unless dry_run
+      begin
+        run_copy(path, destination + '/') unless dry_run
+      rescue Errno::ETIMEDOUT => e
+        sleep 1
+        retry
+      end
     end
     pbar.finish
   end
@@ -65,7 +74,7 @@ class BatchImportPackager
       REXML::XPath.each(doc, '//Node/Type' ) do | type_node |
         if type_node.text == node_type
           packager_class = self.class.const_get(node_type)
-          more_sequences = packager_class.new(type_node.parent, setup_path).sequences
+          more_sequences = packager_class.new(type_node.parent, setup_path).sequences.compact
           add_sequences(more_sequences)
         end
       end

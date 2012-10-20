@@ -14,6 +14,15 @@ class BatchImportPackager::ImportFile
     doc = REXML::Document.new(File.read(import_node_path))
     path_to_first_sequence_element = REXML::XPath.first(doc, 'Setup/State/FileName').text
     
-    @sequences.push(Sequencer.from_single_file(path_to_first_sequence_element))
+    @sequences.push(package_sequence(path_to_first_sequence_element))
+  end
+  
+  def package_sequence(first_file)
+    begin
+      Sequencer.from_single_file(first_file)
+    rescue RuntimeError
+      $stderr.puts "Cannot package sequence starting at #{first_file} - no such file on filesystems!"
+      nil
+    end
   end
 end

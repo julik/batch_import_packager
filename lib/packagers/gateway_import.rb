@@ -35,6 +35,11 @@ class BatchImportPackager::GatewayImport
     frame_range = (frames_padded[0].to_i)..(frames_padded[-1].to_i)
     first_file = descriptor.gsub(FRAMES_PATTERN, frames_padded[0])
     
-    Sequencer.from_single_file(first_file)
+    begin
+      Sequencer.from_single_file(first_file)
+    rescue RuntimeError
+      $stderr.puts "Cannot package sequence starting at #{first_file} - no such file on filesystems!"
+      nil
+    end
   end
 end
